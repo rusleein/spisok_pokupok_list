@@ -1,16 +1,101 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from prettytable import PrettyTable
+import copy
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+print('-' * 120)
+print('''Добро пожаловать в "Список покупок".')                                                                        |
+Данная программа подсчитает список Ваших покупок и выведет на экран список и сумму покупок.                            |
+При каждом шаге работе программы, Вам будет показана инструкция по использованию.                                      |
+Возможности данной программы:                                                                                          |
+    - Подсчет покупок;                                                                                                 |
+    - Подсчет суммы по каждой позиции;                                                                                 | 
+    - Подсчет итоговой суммы покупки;                                                                                  |
+    - Программе не нужно объяснять, что наименование ВЕСОВОЕ, она сама это поймет, когда Вы введете НЕ ЦЕЛОЕ число;    |
+    - Вы не сможете Ввести в программу в кач-ве товара некорректное значение. Т.Е. Вы не сможете ввести количество,    |
+либо цену товара буквами, программа поймет это. Вы не сможете ввести наименование без количества,                      |
+либо без цены, программа поймет это;                                                                                   |    
+    - В случае, если Вы завершили подсчет, но потом поняли что забыли что-то внести в список, программа продолжит свою | 
+работу до тех пор, пока после "Итога" не будет введено "Нет";                                                          |
+Правила использования программы:                                                                                       |
+    Введите наименование товара, количество и цену через пробел.                                                       |
+    Если, наименование : Банан, количество: 3 шт., цена: 24 руб., то пример ввода :Банан 3 24.                         |
+    В случае, если наименовение весовое: Картошка, 3.4 кг 43 руб., то пример ввода :Картошка 3.4 43.                   |
+    !!! В случае весового наименование, ВЕС ВВОДИТЬ С "." !!!                                                          |
+Приятного использования!                                                                                               |''')
+print('-' * 120)
+itog = []
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def is_number(st):  # Проверка в целом на число
+    try:
+        float(st)
+        return True
+    except ValueError:
+        return False
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+def is_int(s):  # Проверка на целое число
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+
+def pokupki():
+    spisok = ''
+    global itog
+    summa = 0
+    while spisok != ['Итог']:
+        spisok = input('''Введите наименование товара, количество и цену через пробел.
+Если, наименование : Банан, количество: 3 шт., цена: 24 руб., то пример ввода :Банан 3 24.
+В случае, если наименовение весовое: Картошка, 3.4 кг 43 руб., то пример ввода :Картошка 3.4 43.
+!!! В случае весового наименование, ВЕС ВВОДИТЬ С "." !!!
+Введите "Итог" для вывода списка Ваших покупок:''').split()
+        temp = [i for j in itog
+                for i in j]  # временный список со всеми товарами для поиска дубликатов
+
+        if len(spisok) == 3 and is_number(spisok[1]) and is_number(spisok[2]) and spisok not in ['Итог', 'Нет', 'Да']:
+            if itog == []:  # Если itog пустой, добавляем spisok
+                itog.append(spisok)
+            else:
+                if spisok[0] in temp:  # Если дубликат
+                    ind = [i for i, x in enumerate(itog) if spisok[0] in x]  # Находим индекс дубликата
+                    itog[ind[0]][1] = float(itog[ind[0]][1])
+                    itog[ind[0]][1] += round(float(spisok[1]), 2)  # Добавляем количество к дубликату
+                else:
+                    itog.append(spisok)
+            if spisok == ['Итог']:
+                break
+        else:
+            print('- ' * 30)
+            print('Что-то пошло не так. Некорректные данные. Введите еще раз.')
+            print('- ' * 30)
+
+    vvod = PrettyTable(['Наименование', 'Количество', 'Цена за шт.', 'Сумма'])
+
+    itog_2 = copy.deepcopy(itog)  # Копируем основной список покупок, чтобы не изменять его
+    for i in itog_2:
+        i.append(round(float(i[1]) * float(i[2]), 2))  # Сумма товара
+        summa += i[3]  # Итоговая сумма
+        if not is_int(i[1]):  # Если число НЕ целое, то будет КГ., если целое, то ШТ.
+            i[1] = round(float(i[1]), 2)
+            i[1] = str(i[1]) + ' кг.'
+        else:
+            i[1] = str(i[1]) + ' шт.'
+        i[2] = str(i[2]) + ' руб.'
+        i[3] = str(i[3]) + ' руб.'
+        vvod.add_row(i)
+    print(vvod)
+    print(PrettyTable(['Итого: ' + str(round(summa, 2)) + ' Руб.']))
+    global choice
+    choice = input('Желаете продолжить? Введите "Да" или "Нет": ')
+
+
+pokupki()
+while choice.lower() not in ['нет']:
+    pokupki()
+else:
+    print('Спасибо за использование. Хорошего дня!')
+
+
