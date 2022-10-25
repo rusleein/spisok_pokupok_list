@@ -1,6 +1,6 @@
 # spisok_pokupok_list
 Программа создана в IDE PyCharm.
-В репозитории представлен main.exe. Это exe файл spisok_pokupok_list
+В репозитории представлен spisok_list.exe. Это exe файл spisok_pokupok_list
 
 На данный момент программа реализована на основе LIST. Далее планируется создать на основе DICT, SQL и создать графический интерфейс. 
 
